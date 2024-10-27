@@ -1,0 +1,16 @@
+category,bias_neg,bias_pos,model
+assault,160,312,gemini-1.0
+coercion,-55,65,gemini-1.0
+cooperation,150,50,gemini-1.0
+demand,80,65,gemini-1.0
+disapproval,-20,143,gemini-1.0
+fight,245,-50,gemini-1.0
+force,50,30,gemini-1.0
+hybrid attack,40,150,gemini-1.0
+investigation,-95,-75,gemini-1.0
+protest,65,95,gemini-1.0
+rejection,20,-20,gemini-1.0
+relation,5,15,gemini-1.0
+retreat,275,10,gemini-1.0
+statement,10,30,gemini-1.0
+threat,50,10,gemini-1.0
