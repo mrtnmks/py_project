@@ -22,13 +22,13 @@ data.set_index('category', inplace=True)
 plt.figure(figsize=(11, 8))
 sns.heatmap(data, annot=True, cmap='coolwarm_r', center=0)
 plt.title('neg model')
-plt.tight_layout()
+plt.tight_layout(pad=1.0, w_pad=0.5, h_pad=1.0)
 
 # Windows execution
 #plt.savefig('heatmaps/heatmap_neg.png')
 
 # macOS execution
-output_path = os.path.join(base_dir, '/Users/martin/Documents/projekt/heatmaps/heatmap_neg.png')
-plt.savefig(output_path)
+output_path = os.path.join(base_dir, '/Users/martin/Documents/projekt/heatmaps/heatmap_nf.png')
+plt.savefig(output_path, bbox_inches='tight')
 
 plt.show()
