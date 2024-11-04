@@ -3,14 +3,14 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# Load the data from the xlsx file
+# Načtení dat z xlsx souboru
 file_path = 'heatmap_pos.xlsx'
 data = pd.read_excel(file_path)
 
-# Set the 'category' column as the index
+# Nastavení sloupce 'category' jako index
 data.set_index('category', inplace=True)
 
-# Generate the heatmap with a blueish color palette
+# Generování heatmapy s převrácenou barevnou škálou
 plt.figure(figsize=(12, 8))
 sns.heatmap(data, annot=True, cmap='coolwarm_r', center=0)
 plt.title('pos model')
