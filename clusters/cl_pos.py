@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load the data from the Excel file
-df = pd.read_excel('cl_neg_with_std.xlsx')
+df = pd.read_excel('cl_pos_with_std.xlsx')
 
 # Define the markers for each model
 markers = {
@@ -18,7 +18,7 @@ markers = {
 df['model'] = df['model'].str.replace('vanilla-', '')
 
 # Remove "neg" suffix from category names
-df['category'] = df['category'].str.replace(' neg', '')
+df['category'] = df['category'].str.replace(' pos', '')
 
 # Use a seaborn color palette for better aesthetics and ensure unique colors
 palette = sns.color_palette("tab20", len(df['category'].unique()))
@@ -68,8 +68,6 @@ plt.legend(handles=[plt.Line2D([0], [0], color='w', label='Category')] + categor
 plt.xlabel('sentiment_UA')
 plt.ylabel('sentiment_RU')
 plt.grid(True)
-
-# Save the plot with tight layout to include the full legend
 plt.tight_layout()
-plt.savefig('test.png', dpi=300, bbox_inches='tight')
+plt.savefig('test1.png', dpi=300, bbox_inches='tight')
 plt.show()
