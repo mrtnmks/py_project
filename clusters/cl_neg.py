@@ -5,13 +5,32 @@ import seaborn as sns
 # Load the data from the Excel file
 df = pd.read_excel('cl_neg_with_std.xlsx')
 
-# Define the markers for each model
+# Define the colors for each model
+colors = {
+    'llama3-8B': 'blue',
+    'mistral-7B': 'orange',
+    'claude-3.5': 'green',
+    'gemini-1.0': 'red',
+    'gpt-4': 'purple'
+}
+
+# Define the markers for each category
 markers = {
-    'llama3-8B': 'o',
-    'mistral-7B': 'X',
-    'claude-3.5': 's',
-    'gemini-1.0': 'D',
-    'gpt-4': '^'
+    'make statement': 'o',
+    'cooperate': 'X',
+    'yield': 's',
+    'investigate': 'D',
+    'demand': '^',
+    'disapprove': '<',
+    'reject': '>',
+    'threaten': 'v',
+    'protest': '*',
+    'exhibit force': 'P',
+    'reduce relations': 'H',
+    'coerce': '8',
+    'assault': 'h',
+    'fight': 'p',
+    'mass violence': 'd'
 }
 
 # Remove "vanilla-" prefix from model names
@@ -19,10 +38,6 @@ df['model'] = df['model'].str.replace('vanilla-', '')
 
 # Remove "neg" suffix from category names
 df['category'] = df['category'].str.replace(' neg', '')
-
-# Use a seaborn color palette for better aesthetics and ensure unique colors
-palette = sns.color_palette("tab20", len(df['category'].unique()))
-base_colors = dict(zip(df['category'].unique(), palette))
 
 # Normalize std_dev for transparency scaling
 df['std_dev_norm'] = df['std_dev'] / df['std_dev'].max()
@@ -33,11 +48,11 @@ for model in df['model'].unique():
     for category in df['category'].unique():
         subset = df[(df['model'] == model) & (df['category'] == category)]
         for _, row in subset.iterrows():
-            alpha_value = max(0.2, 1 - row['std_dev_norm'])  # Ensure minimum alpha value of 0.2
+            alpha_value = max(0.5, 1 - row['std_dev_norm'])  # Ensure minimum alpha value of 0.5
             plt.scatter(row['mean_ua'], row['mean_ru'],
                         label=f'{model} - {category}',
-                        marker=markers[model],
-                        color=base_colors[category],
+                        marker=markers[category],
+                        color=colors[model],
                         alpha=alpha_value,  # Adjust transparency based on std_dev_norm
                         edgecolor='black', linewidth=0.5)
 
@@ -50,14 +65,14 @@ plt.plot([0, max(df['mean_ua'].max(), df['mean_ru'].max())],
 handles, labels = plt.gca().get_legend_handles_labels()
 
 # Create legend for categories
-category_handles = [plt.Line2D([0], [0], marker='o', color='w', label=category,
-                               markersize=10, markerfacecolor=base_colors[category], markeredgecolor='black', markeredgewidth=0.5) for category in base_colors.keys()]
-category_labels = list(base_colors.keys())
+category_handles = [plt.Line2D([0], [0], marker=markers[category], color='w', label=category,
+                               markersize=10, markerfacecolor='k', markeredgecolor='black', markeredgewidth=0.5) for category in markers.keys()]
+category_labels = list(markers.keys())
 
 # Create legend for models
-model_handles = [plt.Line2D([0], [0], marker=markers[model], color='w', label=model,
-                            markersize=10, markerfacecolor='k', markeredgecolor='black', markeredgewidth=0.5) for model in markers.keys()]
-model_labels = list(markers.keys())
+model_handles = [plt.Line2D([0], [0], marker='o', color='w', label=model,
+                            markersize=10, markerfacecolor=colors[model], markeredgecolor='black', markeredgewidth=0.5) for model in colors.keys()]
+model_labels = list(colors.keys())
 
 # Add legends to the plot with titles "Category" and "Models"
 plt.legend(handles=[plt.Line2D([0], [0], color='w', label='Category')] + category_handles +
@@ -68,8 +83,6 @@ plt.legend(handles=[plt.Line2D([0], [0], color='w', label='Category')] + categor
 plt.xlabel('sentiment_UA')
 plt.ylabel('sentiment_RU')
 plt.grid(True)
-
-# Save the plot with tight layout to include the full legend
 plt.tight_layout()
-plt.savefig('test.png', dpi=300, bbox_inches='tight')
+#plt.savefig('test_neg.png', dpi=300, bbox_inches='tight')
 plt.show()
