@@ -2,9 +2,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+import os
+
+# Get the directory of the current script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Construct the full path to the Excel file
+excel_path = os.path.join(script_dir, 'cl_pos_with_std.xlsx')
 
 # Load the data from the Excel file
-df = pd.read_excel('cl_pos_with_std.xlsx')
+df = pd.read_excel(excel_path)
 
 # Define the colors for each model
 colors = {
