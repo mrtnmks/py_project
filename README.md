@@ -3,9 +3,8 @@ Vytvorim nove virtualni prostredi
 ``` 
 python3 -m venv venv
 . venv/bin/activate
-#Instalace modulu pandas
-pip install pandas
-pip install seaborn
+#Instalace vsech potrebnych modulu
+pip install pandas matplotlib seaborn openpyxl
 ```
 
 Seznam nainstalovanych python modulu
