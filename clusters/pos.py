@@ -10,6 +10,10 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 # Construct the full path to the Excel file
 excel_path = os.path.join(script_dir, 'cl_pos_with_std.xlsx')
 
+save_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../data/clusters')
+os.makedirs(save_dir, exist_ok=True)
+save_path = os.path.join(save_dir, 'cluster_pos_contours.png')
+
 # Load the data from the Excel file
 df = pd.read_excel(excel_path)
 
@@ -107,8 +111,7 @@ plt.legend(handles=[plt.Line2D([0], [0], color='w', label='Category')] + categor
 # Add labels, grid, and save the plot
 plt.xlabel('sentiment_UA')
 plt.ylabel('sentiment_RU')
-#plt.title('Scatter Plot with 2D Density Contours')
 plt.grid(True)
 plt.tight_layout()
-plt.savefig('cluster_pos.png', dpi=300, bbox_inches='tight')
+plt.savefig(save_path, dpi=300, bbox_inches='tight')
 plt.show()

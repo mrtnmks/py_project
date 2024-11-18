@@ -10,6 +10,10 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 # Construct the full path to the Excel file
 excel_path = os.path.join(script_dir, 'cl_neg_with_std.xlsx')
 
+save_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../data/clusters')
+os.makedirs(save_dir, exist_ok=True)
+save_path = os.path.join(save_dir, 'cluster_neg_contours.png')
+
 # Load the data from the Excel file
 df = pd.read_excel(excel_path)
 
@@ -108,5 +112,5 @@ plt.xlabel('sentiment_UA')
 plt.ylabel('sentiment_RU')
 plt.grid(True)
 plt.tight_layout()
-plt.savefig('test_neg_updated.png', dpi=300, bbox_inches='tight')
+plt.savefig(save_path, dpi=300, bbox_inches='tight')
 plt.show()
