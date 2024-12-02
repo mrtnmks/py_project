@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 import os
 
 # Získání adresáře aktuálního skriptu
@@ -53,61 +52,47 @@ df['category'] = df['category'].str.replace(' neg', '')
 # Normalizace std_dev pro škálování průhlednosti
 df['std_dev_norm'] = df['std_dev'] / df['std_dev'].max()
 
+# Parametry Gaussiánu
+grid_size = 100
+w = 25# Experimentální šířka Gaussiánu
+threshold = 1.1  # Spodní hranice pro vykreslení vrstevnic
+
 # Vytvoření scatter plotu
 plt.figure(figsize=(12, 8))
 for model in df['model'].unique():
-    for category in df['category'].unique():
-        subset = df[(df['model'] == model) & (df['category'] == category)]
-        for _, row in subset.iterrows():
-            alpha_value = max(0.45, 1 - row['std_dev_norm'])  # Zajištění minimální hodnoty průhlednosti 0.5
-            plt.scatter(row['mean_ua'], row['mean_ru'],
-                        label=f'{model} - {category}',
-                        marker=markers[category],
-                        color=colors[model],
-                        alpha=alpha_value,  # Úprava průhlednosti na základě std_dev_norm
-                        edgecolor='black', linewidth=0.5)
+    model_data = df[df['model'] == model]
 
-# Přidání vrstevnic hustoty pro každý model pomocí sns.kdeplot s upravenými parametry
-for model in df['model'].unique():
-    subset = df[df['model'] == model]
+    # Vykreslení bodů
+    for _, row in model_data.iterrows():
+        alpha_value = max(0.5, 1 - row['std_dev_norm'])  # Zajištění minimální hodnoty průhlednosti 0.5
+        plt.scatter(row['mean_ua'], row['mean_ru'],
+                    marker=markers[row['category']],
+                    color=colors[model],
+                    alpha=alpha_value,  # Nastavení průhlednosti na základě std_dev_norm
+                    edgecolor='black', linewidth=0.5)
 
-    x = subset['mean_ua']
-    y = subset['mean_ru']
+    # Vytvoření gridu
+    x_min, x_max = model_data['mean_ua'].min() - 10, model_data['mean_ua'].max() + 10
+    y_min, y_max = model_data['mean_ru'].min() - 10, model_data['mean_ru'].max() + 10
+    X, Y = np.meshgrid(np.linspace(x_min, x_max, grid_size),
+                       np.linspace(y_min, y_max, grid_size))
 
-    if len(x) > 1:
-        if model == "gpt-4":
-            sns.kdeplot(
-                x=x, y=y,
-                levels=4,  # Méně vrstevnic pro fialový model (gpt-4)
-                color=colors[model],
-                linewidths=0.3,
-                bw_adjust=0.5,  # Ještě detailnější shluky
-                thresh=0.3
-            )
-        elif model == "claude-3.5":
-            sns.kdeplot(
-                x=x, y=y,
-                levels=4,  # Více vrstevnic pro zelený model (claude-3.5)
-                color=colors[model],
-                linewidths=0.3,
-                bw_adjust=0.5,  # Ještě detailnější shluky
-                thresh=0.3
-            )
-        else:
-            sns.kdeplot(
-                x=x, y=y,
-                levels=4,  # Zůstává počet vrstevnic pro ostatní modely
-                color=colors[model],
-                linewidths=0.3,
-                bw_adjust=0.4,  # Ještě detailnější shluky
-                thresh=0.4
-            )
+    # Vytvoření Z jako součtu Gaussiánů
+    Z = np.zeros_like(X)
+    for _, row in model_data.iterrows():
+        x_i, y_i = row['mean_ua'], row['mean_ru']
+        Z += np.exp(-((X - x_i) ** 2 + (Y - y_i) ** 2) / w)
 
-# Přidání tenké černé diagonální čáry od 0 do 100 na obou osách
+    # Vykreslení vrstevnic pouze pro hodnoty Z >= threshold
+    max_Z = np.nanmax(Z)
+    if not np.all(np.isnan(Z)) and max_Z >= threshold:
+        levels = np.linspace(threshold, max_Z, 5)  # Úrovně vrstevnic
+        plt.contour(X, Y, Z, levels=levels, colors=colors[model], linewidths=0.8)
+
+# Přidání tenké černé diagonální čáry
 plt.plot([0, max(df['mean_ua'].max(), df['mean_ru'].max())],
          [0, max(df['mean_ua'].max(), df['mean_ru'].max())],
          color='black', linestyle='-', linewidth=1)
-
 # Vytvoření vlastních legend pro kategorie a modely
 handles, labels = plt.gca().get_legend_handles_labels()
 
@@ -128,6 +113,7 @@ plt.legend(handles=[plt.Line2D([0], [0], color='w', label='Category')] + categor
                    [plt.Line2D([0], [0], color='w', label='Models')] + model_handles,
            labels=['Category'] + category_labels + ['Models'] + model_labels,
            bbox_to_anchor=(1.05, 1), loc='upper left')
+
 
 plt.xlabel('sentiment_UA')
 plt.ylabel('sentiment_RU')
